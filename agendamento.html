@@ -94,12 +94,12 @@
         .filtro-container {
             position: relative;
             max-width: 800px; /* Limita a largura do carrossel */
-            margin: 0 auto 40px auto;
-            padding: 0 40px; /* Espaço para os botões de navegação */
+            margin: 0 auto 40px auto; /* MELHORIA: Centraliza o container */
+            padding: 0 10px; /* MELHORIA: Reduz o padding para telas menores */
         }
 
         .swiper-slide {
-            width: auto; /* Deixa a largura do slide se ajustar ao conteúdo */
+            width: auto !important; /* Deixa a largura do slide se ajustar ao conteúdo */
             display: flex;
             justify-content: center;
             /* MELHORIA: Adiciona um pequeno espaçamento horizontal entre os botões de filtro */
@@ -109,6 +109,12 @@
         /* Estilo dos botões de navegação do Swiper */
         .swiper-button-next, .swiper-button-prev {
             color: var(--cor-primaria);
+            background-color: rgba(255, 255, 255, 0.8); /* MELHORIA: Fundo para melhor visibilidade */
+            border-radius: 50%;
+            width: 30px !important;
+            height: 30px !important;
+            top: 50%;
+            transform: translateY(-50%) scale(0.6);
             transform: scale(0.7);
         }
 
@@ -120,6 +126,7 @@
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 500;
+            white-space: nowrap; /* MELHORIA: Impede que o texto do botão quebre */
         }
 
         .btn-filtro:hover, .btn-filtro.ativo {
@@ -131,7 +138,7 @@
         /* --- Grid de Serviços --- */
         .grid-servicos {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); /* MELHORIA: Leve ajuste no tamanho mínimo */
             gap: 30px;
         }
 
@@ -326,8 +333,9 @@
         /* Horários em formato de Pílulas */
         .grid-horarios {
             display: flex;
+            flex-wrap: wrap; /* Permite que os botões quebrem para a próxima linha */
             gap: 10px;
-            justify-content: space-between;
+            justify-content: flex-start; /* Alinha os botões ao início */
         }
 
         .btn-hora {
@@ -411,6 +419,16 @@
             .modal-box {
                 width: 95%;
                 padding: 30px 25px;
+                max-height: 90vh; /* MELHORIA: Garante que o modal não saia da tela */
+                overflow-y: auto; /* MELHORIA: Adiciona scroll se o conteúdo for maior */
+            }
+            .filtro-container {
+                padding: 0; /* MELHORIA: Remove padding lateral no mobile */
+            }
+            /* MELHORIA: Impede o zoom automático em inputs no iOS/mobile */
+            input[type="text"],
+            input[type="date"] {
+                font-size: 16px;
             }
         }
 
@@ -421,6 +439,10 @@
                 gap: 10px;
             }
             .btn-hora { flex: auto; } /* Reseta o flex para o grid funcionar */
+            .swiper-button-next, .swiper-button-prev {
+                display: none; /* MELHORIA: Esconde as setas de navegação no mobile, o swipe é suficiente */
+            }
+
         }
 
     </style>
@@ -711,10 +733,17 @@
             <div class="selecao-grupo">
                 <label>2. Horários Disponíveis:</label>
                 <div class="grid-horarios">
+                    <button class="btn-hora" onclick="selecionarHora(this, '08:00')">08:00</button>
                     <button class="btn-hora" onclick="selecionarHora(this, '09:00')">09:00</button>
+                    <button class="btn-hora" onclick="selecionarHora(this, '10:00')">10:00</button>
                     <button class="btn-hora" onclick="selecionarHora(this, '11:00')">11:00</button>
+                    <button class="btn-hora" onclick="selecionarHora(this, '12:00')">12:00</button>
+                    <button class="btn-hora" onclick="selecionarHora(this, '13:30')">13:30</button>
                     <button class="btn-hora" onclick="selecionarHora(this, '14:00')">14:00</button>
+                    <button class="btn-hora" onclick="selecionarHora(this, '15:00')">15:00</button>
                     <button class="btn-hora" onclick="selecionarHora(this, '16:00')">16:00</button>
+                    <button class="btn-hora" onclick="selecionarHora(this, '17:00')">17:00</button>
+                    <button class="btn-hora" onclick="selecionarHora(this, '17:30')">17:30</button>
                 </div>
             </div>
 
@@ -736,13 +765,21 @@
     <div class="modal-overlay" id="modalAvisoMegaHair">
         <div class="modal-box">
             <span class="fechar-modal" onclick="fecharAvisoMegaHair()">&times;</span>
-            <h2>Observação</h2>
-            <p style="text-align: center; line-height: 1.6; font-size: 1rem; color: var(--texto-corpo);">
-                Ajustes de tela grátis por 7 dias.
-                <br><br>
-                Após 7 dias — <strong>R$ 10,00 por ajuste</strong>.
+            <h2 style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <img src="https://api.iconify.design/mdi:information-outline.svg?color=%23b76e79" alt="Ícone de Informação" style="width: 28px; height: 28px;">
+                Aviso Importante
+            </h2>
+            <p style="text-align: center; line-height: 1.6; font-size: 1rem; color: var(--texto-corpo); margin-top: 20px;">
+                Para garantir a melhor experiência com seu <strong>Mega Hair</strong>, oferecemos uma política de ajustes:
             </p>
-            <button class="btn-confirmar" style="margin-top: 20px;" onclick="fecharAvisoMegaHair()">Entendi</button>
+            <div style="background-color: var(--cor-fundo); padding: 15px; border-radius: 10px; text-align: center; margin-top: 10px;">
+                <p style="margin: 5px 0;"><strong>Até 7 dias após a aplicação:</strong><br>Ajustes na tela do aplique são cortesia do salão.</p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 15px 0;">
+                <p style="margin: 5px 0;"><strong>Após o 7º dia:</strong><br>O valor para cada ajuste é de R$ 10,00.</p>
+            </div>
+            <p style="text-align: center; font-size: 0.85rem; color: #999; margin-top: 20px;">Esta política visa garantir a durabilidade e o seu conforto.</p>
+
+            <button class="btn-confirmar" style="margin-top: 20px;" onclick="fecharAvisoMegaHair()">Estou Ciente</button>
         </div>
     </div>
 
@@ -769,7 +806,14 @@
             minDate: "today", // Impede a seleção de datas passadas
             altInput: true, // Cria um input visualmente separado (melhor para formatos)
             altFormat: "Y-m-d", // Formato que o código vai usar (compatível com o anterior)
-            disableMobile: "true" // Força o uso do calendário customizado em celulares
+            disableMobile: "true", // Força o uso do calendário customizado em celulares
+            // --- MELHORIA: Desabilita os domingos ---
+            disable: [
+                function(date) {
+                    // Retorna true para desabilitar o dia. 0 = Domingo.
+                    return (date.getDay() === 0);
+                }
+            ]
         });
 
         // 5. Inicializar o Swiper para o carrossel de categorias
@@ -885,12 +929,6 @@
         }
 
         function filtrarServicos(categoria, elementoBotao) {
-            // Mostra o aviso se a categoria for 'Mega hair' e ainda não tiver sido mostrado
-            if (categoria === 'Mega hair' && !avisoMegaHairMostrado) {
-                document.getElementById('modalAvisoMegaHair').style.display = 'flex';
-                avisoMegaHairMostrado = true; // Marca que o aviso já foi exibido nesta sessão
-            }
-
             const loader = document.getElementById('loader');
             const cards = document.querySelectorAll('.card-servico');
 
@@ -915,9 +953,14 @@
             horarioSelecionado = hora;
         }
 
-        // Mostra todos os serviços quando a página carrega pela primeira vez
+        // Mostra todos os serviços e o aviso de Mega Hair quando a página carrega
         document.addEventListener('DOMContentLoaded', () => {
             mostrarCards('todos');
+            // Mostra o aviso de Mega Hair assim que a página carregar, se ainda não foi mostrado
+            if (!avisoMegaHairMostrado) {
+                document.getElementById('modalAvisoMegaHair').style.display = 'flex';
+                avisoMegaHairMostrado = true; // Marca que o aviso já foi exibido
+            }
         });
 
         function finalizarAgendamento() {

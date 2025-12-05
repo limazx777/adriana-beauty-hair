@@ -35,7 +35,7 @@
         nav {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: center; /* MELHORIA: Garante alinhamento vertical consistente */
             padding: 20px 50px;
             background-color: var(--branco);
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -88,13 +88,19 @@
             flex-direction: column;
             align-items: center; /* Centraliza os itens do menu */
             position: absolute;
-            top: 90px; /* Altura da barra de navegação */
+            top: 86px; /* Altura da barra de navegação (ajustado) */
             right: 0;
             background: var(--branco);
             width: 100%;
             text-align: center;
             box-shadow: 0 8px 10px rgba(0,0,0,0.05);
             padding: 20px 0;
+        }
+        
+        /* MELHORIA: Garante que o menu ativo ocupe o espaço corretamente */
+        .menu-links.active a {
+            width: 100%;
+            box-sizing: border-box;
         }
 
         /* --- Hero Section (Capa) --- */
@@ -112,7 +118,7 @@
             color: var(--branco);
         }
 
-        .hero h1 { font-size: 3.5rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .hero h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); } /* MELHORIA: Fonte fluida */
         .hero p { font-size: 1.2rem; margin-bottom: 30px; letter-spacing: 1px; }
 
         .btn-agendar {
@@ -245,7 +251,7 @@
             /* Você pode alterar o primeiro valor (70%) para mover a imagem horizontalmente. */
             /* Valores maiores que 50% movem para a direita, menores para a esquerda. */
             .hero { background-position: 80% center; }
-
+            
             .hero p { font-size: 1.1rem; }
             nav { padding: 20px; flex-direction: row; } /* Garante logo e ícone na mesma linha */
             
@@ -260,7 +266,7 @@
                 width: 100%;
             }
 
-            .galeria { padding: 50px 40px; }
+            .galeria { padding: 50px 20px; } /* MELHORIA: Unifica o padding lateral */
         }
 
         @media (max-width: 480px) {
