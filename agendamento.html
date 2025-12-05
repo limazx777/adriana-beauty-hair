@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas | Adriana Beauty Hair</title>
+    <!-- 1. Adicionar CSS do Flatpickr (biblioteca de calendário) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cor-primaria: #b76e79;  /* Rose Gold */
+            --cor-fundo: #fdfbfb;     /* Branco levemente rosado/cinza */
+            --texto-titulo: #2c3e50;
+            --texto-corpo: #555;
+            --sombra-suave: 0 10px 30px rgba(183, 110, 121, 0.15); /* Sombra rosada */
+        }
+
+        /* 2. Personalizar cores do Flatpickr para combinar com o site */
+        .flatpickr-day.selected {
+            background: var(--cor-primaria);
+            border-color: var(--cor-primaria);
+        }
+        .flatpickr-day.today { border-color: var(--cor-primaria); }
+        .flatpickr-day:hover { background: #fdeef0; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            margin: 0;
+            background-color: var(--cor-fundo);
+            color: var(--texto-corpo);
+        }
+
+        /* --- Cabeçalho Minimalista --- */
+        header {
+            background-color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--cor-primaria);
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .btn-voltar {
+            text-decoration: none;
+            color: var(--texto-titulo);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid transparent;
+            transition: 0.3s;
+        }
+
+        .btn-voltar:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); }
+
+        /* --- Área Principal --- */
+        .container-principal {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .titulo-secao {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--texto-titulo);
+            margin-bottom: 10px;
+        }
+
+        .subtitulo {
+            text-align: center;
+            margin-bottom: 50px;
+            font-weight: 300;
+            color: #888;
+        }
+
+        /* --- Carrossel de Categorias --- */
+        .filtro-container {
+            position: relative;
+            max-width: 800px; /* Limita a largura do carrossel */
+            margin: 0 auto 40px auto;
+            padding: 0 40px; /* Espaço para os botões de navegação */
+        }
+
+        .swiper-slide {
+            width: auto; /* Deixa a largura do slide se ajustar ao conteúdo */
+            display: flex;
+            justify-content: center;
+            /* MELHORIA: Adiciona um pequeno espaçamento horizontal entre os botões de filtro */
+            margin: 0 5px;
+        }
+
+        /* Estilo dos botões de navegação do Swiper */
+        .swiper-button-next, .swiper-button-prev {
+            color: var(--cor-primaria);
+            transform: scale(0.7);
+        }
+
+        .btn-filtro {
+            background: transparent;
+            border: 1px solid #e0e0e0;
+            padding: 10px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-filtro:hover, .btn-filtro.ativo {
+            background: var(--cor-primaria);
+            color: white;
+            border-color: var(--cor-primaria);
+        }
+
+        /* --- Grid de Serviços --- */
+        .grid-servicos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        /* --- Animação de Loading para Filtragem --- */
+        .loader-container {
+            display: none; /* Começa escondido */
+            width: 100%;
+            padding: 60px 0;
+            text-align: center;
+            grid-column: 1 / -1; /* Ocupa todas as colunas do grid */
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3; /* Cinza claro */
+            border-top: 5px solid var(--cor-primaria); /* Cor primária */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Animação para os cards aparecerem suavemente */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-servico {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #f0f0f0;
+            position: relative;
+            overflow: hidden;
+            display: none; /* MODIFICAÇÃO: Cards começam escondidos para animação inicial */
+        }
+
+        .card-servico:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--sombra-suave);
+            border-color: transparent;
+        }
+
+        /* Detalhe decorativo no topo do card */
+        .card-servico::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 5px;
+            background: var(--cor-primaria);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+            transform-origin: left;
+        }
+
+        .card-servico:hover::before { transform: scaleX(1); }
+
+        .card-servico h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            margin: 10px 0;
+            color: var(--texto-titulo);
+        }
+
+        .card-categoria {
+            display: inline-block;
+            background-color: #fff0f5;
+            color: var(--cor-primaria);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .card-preco {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--texto-titulo);
+            margin: 20px 0;
+        }
+
+        .btn-reservar {
+            background-color: transparent;
+            color: var(--cor-primaria);
+            border: 2px solid var(--cor-primaria);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .btn-reservar:hover {
+            background-color: var(--cor-primaria);
+            color: white;
+        }
+
+        /* --- MODAL (Janela Flutuante) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(44, 62, 80, 0.4); /* Fundo escuro leve */
+            backdrop-filter: blur(5px); /* Efeito de vidro embaçado */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            animation: subir 0.4s ease-out;
+        }
+
+        @keyframes subir {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* --- Melhoria Visual: Mensagem de Erro no Modal --- */
+        .mensagem-erro {
+            display: none; /* Começa escondida */
+            background-color: #ffeded;
+            color: #c0392b;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .fechar-modal {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #ccc;
+            line-height: 1;
+        }
+        
+        .fechar-modal:hover { color: var(--cor-primaria); }
+
+        .modal-box h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--cor-primaria);
+            text-align: center;
+            margin-top: 0;
+        }
+
+        .selecao-grupo { margin-bottom: 20px; }
+        .selecao-grupo label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 0.9rem; }
+
+        input[type="date"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Lato', sans-serif;
+            box-sizing: border-box;
+            background: var(--cor-fundo); /* Usa a cor de fundo principal */
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* --- Melhoria Visual: Foco nos inputs --- */
+        input[type="date"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--cor-primaria);
+            box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.2);
+        }
+
+        /* Horários em formato de Pílulas */
+        .grid-horarios {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .btn-hora {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-hora:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); }
+        
+        .btn-hora.selecionado {
+            background-color: var(--cor-primaria);
+            color: white;
+            border-color: var(--cor-primaria);
+            box-shadow: 0 5px 15px rgba(183, 110, 121, 0.4);
+        }
+
+        .btn-confirmar {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--cor-primaria);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            /* --- Melhoria Visual: Botão mais interativo --- */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        /* --- Melhoria: Estilo para seleção de tamanho no modal --- */
+        .grid-tamanhos {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .btn-tamanho {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .btn-tamanho:hover { border-color: var(--cor-primaria); color: var(--cor-primaria); }
+        
+        .btn-tamanho.selecionado { background-color: var(--cor-primaria); color: white; border-color: var(--cor-primaria); }
+
+        .btn-confirmar:hover { background-color: #a05a65; transform: scale(1.02); }
+
+        /* --- Responsividade --- */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+            }
+            .titulo-secao { font-size: 2rem; }
+            .grid-servicos {
+                grid-template-columns: 1fr; /* Uma coluna em telas menores */
+            }
+            .modal-box {
+                width: 95%;
+                padding: 30px 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid-horarios {
+                display: grid;
+                grid-template-columns: 1fr 1fr; /* Duas colunas para os horários */
+                gap: 10px;
+            }
+            .btn-hora { flex: auto; } /* Reseta o flex para o grid funcionar */
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Adriana Beauty Hair</div>
+        <a href="index.html" class="btn-voltar">← Voltar ao Início</a>
+    </header>
+
+    <div class="container-principal">
+        <h1 class="titulo-secao">Menu de Serviços</h1>
+        <p class="subtitulo">Escolha o tratamento ideal para realçar a sua beleza.</p>
+
+        <!-- Filtro de Categorias -->
+        <div class="filtro-container">
+            <div class="swiper filtro-categorias-swiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <button class="btn-filtro ativo" onclick="filtrarServicos('todos', this)">Todos</button>
+                    </div>
+                    <div class="swiper-slide">
+                        <button class="btn-filtro" onclick="filtrarServicos('Tratamentos Capilares', this)">Tratamentos Capilares</button>
+                    </div>
+                    <div class="swiper-slide">
+                        <button class="btn-filtro" onclick="filtrarServicos('Finalização / Escovas', this)">Finalização / Escovas</button>
+                    </div>
+                    <div class="swiper-slide">
+                        <button class="btn-filtro" onclick="filtrarServicos('Químicas', this)">Químicas</button>
+                    </div>
+                    <div class="swiper-slide">
+                        <button class="btn-filtro" onclick="filtrarServicos('Mechas, cor e coloração', this)">Mechas, cor e coloração</button>
+                    </div>
+                    <div class="swiper-slide">
+                        <button class="btn-filtro" onclick="filtrarServicos('Cortes', this)">Cortes</button>
+                    </div>
+                    <div class="swiper-slide">
+                        <button class="btn-filtro" onclick="filtrarServicos('Sobrancelhas', this)">Sobrancelhas</button>
+                    </div>
+                    <div class="swiper-slide">
+                        <button class="btn-filtro" onclick="filtrarServicos('Cílios', this)">Cílios</button>
+                    </div>
+                    <div class="swiper-slide">
+                        <button class="btn-filtro" onclick="filtrarServicos('Mega hair', this)">Mega hair</button>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+
+        <div class="grid-servicos" id="grid-servicos">
+            <!-- Loader para a filtragem -->
+            <div class="loader-container" id="loader">
+                <div class="loader"></div>
+            </div>
+
+            <!-- TRATAMENTOS CAPILARES -->
+            <div class="card-servico" data-categoria="Tratamentos Capilares">
+                <span class="card-categoria">Tratamentos Capilares</span>
+                <h3>Cauterização Ecosmetics</h3>
+                <p style="font-size: 0.9rem; color: #777;">Reestruturação e selamento da fibra capilar.</p>
+                <span class="card-preco">A partir de R$ 60,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Cauterização Ecosmetics', {'P': 60, 'M': 80, 'G': 100})">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Tratamentos Capilares">
+                <span class="card-categoria">Tratamentos Capilares</span>
+                <h3>Reconstrução</h3>
+                <p style="font-size: 0.9rem; color: #777;">Devolve a massa e a força para fios danificados.</p>
+                <span class="card-preco">R$ 85,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Reconstrução', 85.00)">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Tratamentos Capilares">
+                <span class="card-categoria">Tratamentos Capilares</span>
+                <h3>Hidratação Simples + Escova</h3>
+                <p style="font-size: 0.9rem; color: #777;">Devolve a umidade e o brilho com finalização.</p>
+                <span class="card-preco">A partir de R$ 35,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Hidratação Simples + Escova', {'P': 35, 'M': 60, 'G': 80})">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Tratamentos Capilares">
+                <span class="card-categoria">Tratamentos Capilares</span>
+                <h3>Lavagem Simples</h3>
+                <p style="font-size: 0.9rem; color: #777;">Lavar e condicionar os fios.</p>
+                <span class="card-preco">R$ 25,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Lavagem Simples', 25.00)">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Tratamentos Capilares">
+                <span class="card-categoria">Tratamentos Capilares</span>
+                <h3>Higienização Apenas do Mega</h3>
+                <p style="font-size: 0.9rem; color: #777;">Limpeza específica para seu aplique.</p>
+                <span class="card-preco">R$ 20,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Higienização Apenas do Mega', 20.00)">Agendar</button>
+            </div>
+
+            <!-- FINALIZAÇÃO / ESCOVAS -->
+            <div class="card-servico" data-categoria="Finalização / Escovas">
+                <span class="card-categoria">Finalização / Escovas</span>
+                <h3>Escova + Babyliss</h3>
+                <p style="font-size: 0.9rem; color: #777;">Ondas modeladas para um look sofisticado.</p>
+                <span class="card-preco">A partir de R$ 55,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Escova + Babyliss', {'P': 55, 'M': 65, 'G': 100})">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Finalização / Escovas">
+                <span class="card-categoria">Finalização / Escovas</span>
+                <h3>Escova + Chapinha</h3>
+                <p style="font-size: 0.9rem; color: #777;">Fios alinhados e lisos com acabamento profissional.</p>
+                <span class="card-preco">R$ 60,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Escova + Chapinha', 60.00)">Agendar</button>
+            </div>
+
+            <!-- QUÍMICAS -->
+            <div class="card-servico" data-categoria="Químicas">
+                <span class="card-categoria">Químicas</span>
+                <h3>Selagem</h3>
+                <p style="font-size: 0.9rem; color: #777;">Alinhamento e redução de frizz.</br> Obs: valores podem variar após avaliação.</p>
+                <span class="card-preco">A partir de R$ 130,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Selagem', {'P': 130, 'M': 150, 'G': 180})">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Químicas">
+                <span class="card-categoria">Químicas</span>
+                <h3>Botox</h3>
+                <p style="font-size: 0.9rem; color: #777;">Redução de volume e tratamento profundo dos fios.</p>
+                <span class="card-preco">A partir de R$ 100,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Botox', {'P': 100, 'M': 130, 'G': 160})">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Químicas">
+                <span class="card-categoria">Químicas</span>
+                <h3>Plástica Capilar</h3>
+                <p style="font-size: 0.9rem; color: #777;">Reconstrução e hidratação com efeito liso temporário.</p>
+                <span class="card-preco">A partir de R$ 60,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Plástica Capilar', {'P': 60, 'M': 80, 'G': 140})">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Químicas">
+                <span class="card-categoria">Químicas</span>
+                <h3>Aplicação de Selagem (produto da cliente)</h3>
+                <p style="font-size: 0.9rem; color: #777;">Serviço de aplicação profissional.</br> Obs: valor pode alterar após avaliação.</p>
+                <span class="card-preco">R$ 100,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Aplicação de Selagem (produto da cliente)', 100.00)">Agendar</button>
+            </div>
+
+            <!-- MECHAS, COR E COLORAÇÃO -->
+            <div class="card-servico" data-categoria="Mechas, cor e coloração">
+                <span class="card-categoria">Mechas, cor e coloração</span>
+                <h3>Pintura</h3>
+                <p style="font-size: 0.9rem; color: #777;">Coloração uniforme para cobrir fios brancos ou mudar o tom.</p>
+                <span class="card-preco">R$ 60,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Pintura', 60.00)">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Mechas, cor e coloração">
+                <span class="card-categoria">Mechas, cor e coloração</span>
+                <h3>Esfumar Raiz</h3>
+                <p style="font-size: 0.9rem; color: #777;">Suaviza a transição entre a cor natural e as mechas.</p>
+                <span class="card-preco">R$ 60,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Esfumar Raiz', 60.00)">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Mechas, cor e coloração">
+                <span class="card-categoria">Mechas, cor e coloração</span>
+                <h3>Teste de Mecha</h3>
+                <p style="font-size: 0.9rem; color: #777;">Avaliação da saúde do fio para procedimentos químicos.</p>
+                <span class="card-preco">R$ 15,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Teste de Mecha', 15.00)">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Mechas, cor e coloração">
+                <span class="card-categoria">Mechas, cor e coloração</span>
+                <h3>Mechas na Touca</h3>
+                <p style="font-size: 0.9rem; color: #777;">Luzes clássicas para um efeito iluminado e uniforme.</p>
+                <span class="card-preco">A partir de R$ 300,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Mechas na Touca', {'P': 300, 'M': 350, 'G': 400})">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Mechas, cor e coloração">
+                <span class="card-categoria">Mechas, cor e coloração</span>
+                <h3>Moreno Iluminado</h3>
+                <p style="font-size: 0.9rem; color: #777;">Mechas sutis para iluminar cabelos escuros com naturalidade.</p>
+                <span class="card-preco">A partir de R$ 300,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Moreno Iluminado', {'P': 300, 'M': 350, 'G': 400})">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Mechas, cor e coloração">
+                <span class="card-categoria">Mechas, cor e coloração</span>
+                <h3>Mechas em Papelote</h3>
+                <p style="font-size: 0.9rem; color: #777;">Técnica para criar mechas mais definidas e personalizadas.</p>
+                <span class="card-preco">A partir de R$ 350,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Mechas em Papelote', {'P': 350, 'M': 400, 'G': 450})">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Mechas, cor e coloração">
+                <span class="card-categoria">Mechas, cor e coloração</span>
+                <h3>Banho de Brilho</h3>
+                <p style="font-size: 0.9rem; color: #777;">Realça a cor, hidrata e devolve o brilho aos fios.</p>
+                <span class="card-preco">R$ 55,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Banho de Brilho', 55.00)">Agendar</button>
+            </div>
+
+            <!-- CORTES -->
+            <div class="card-servico" data-categoria="Cortes">
+                <span class="card-categoria">Cortes</span>
+                <h3>Corte Feminino</h3>
+                <p style="font-size: 0.9rem; color: #777;">Renove seu visual com um corte moderno e personalizado.</p>
+                <span class="card-preco">R$ 35,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Corte Feminino', 35.00)">Agendar</button>
+            </div>
+
+            <!-- SOBRANCELHAS -->
+            <div class="card-servico" data-categoria="Sobrancelhas">
+                <span class="card-categoria">Sobrancelhas</span>
+                <h3>Designer de Sobrancelha</h3>
+                <p style="font-size: 0.9rem; color: #777;">Modelagem e design para um olhar marcante.</p>
+                <span class="card-preco">A partir de R$ 20,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Designer de Sobrancelha', {'Simples': 20, 'Com Henna': 30})">Agendar</button>
+            </div>
+
+            <!-- CÍLIOS -->
+            <div class="card-servico" data-categoria="Cílios">
+                <span class="card-categoria">Cílios</span>
+                <h3>Extensão de Cílios</h3>
+                <p style="font-size: 0.9rem; color: #777;">Realce seu olhar com cílios longos e volumosos.</p>
+                <span class="card-preco">A partir de R$ 130,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Extensão de Cílios', {'Volume Brasileiro': 130, 'Magia em 4D': 140, 'Volume Luxury': 150})">Agendar</button>
+            </div>
+
+            <!-- MEGA HAIR -->
+            <div class="card-servico" data-categoria="Mega hair">
+                <span class="card-categoria">Mega hair</span>
+                <h3>Manutenção</h3>
+                <p style="font-size: 0.9rem; color: #777;">Ajuste e cuidado para seu mega hair.</p>
+                <span class="card-preco">A partir de R$ 40,00</span>
+                <button class="btn-reservar" onclick="abrirModal('Manutenção de Mega Hair', {'Cabelo Humano (por tela)': 40, 'Cabelo Orgânico (por tela)': 45})">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Mega hair">
+                <span class="card-categoria">Mega hair</span>
+                <h3>Cabelos Humanos — Loiros</h3>
+                <p style="font-size: 0.9rem; color: #777;">Cabelos loiros de alta qualidade, preço por grama.</p>
+                <span class="card-preco">A partir de R$ 24/g</span>
+                <button class="btn-reservar" onclick="abrirModal('Venda de Cabelo Loiro', {'40cm a 60cm': 24, '60cm a 70cm': 26, '75cm a 80cm': 28}, '/grama')">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Mega hair">
+                <span class="card-categoria">Mega hair</span>
+                <h3>Cabelos Humanos Lisos — Castanhos/Pretos</h3>
+                <p style="font-size: 0.9rem; color: #777;">Cabelos lisos naturais, preço por grama.</p>
+                <span class="card-preco">A partir de R$ 23/g</span>
+                <button class="btn-reservar" onclick="abrirModal('Venda de Cabelo Liso (Castanho/Preto)', {'40cm a 60cm': 23, '60cm a 70cm': 26, '75cm a 80cm': 28}, '/grama')">Agendar</button>
+            </div>
+
+            <div class="card-servico" data-categoria="Mega hair">
+                <span class="card-categoria">Mega hair</span>
+                <h3>Cabelos Humanos Cacheados — Castanho/Preto</h3>
+                <p style="font-size: 0.9rem; color: #777;">Cabelos cacheados naturais, preço por grama.</p>
+                <span class="card-preco">A partir de R$ 23/g</span>
+                <button class="btn-reservar" onclick="abrirModal('Venda de Cabelo Cacheado (Castanho/Preto)', {'40cm a 60cm': 23, '60cm a 70cm': 26, '75cm a 80cm': 28}, '/grama')">Agendar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalAgendamento">
+        <div class="modal-box">
+            <span class="fechar-modal" onclick="fecharModal()">&times;</span>
+            
+            <h2>Sua Reserva</h2>
+            <p id="servicoSelecionado" style="text-align: center; color: var(--cor-primaria); font-weight: bold; margin-bottom: 25px;">...</p>
+
+            <div class="selecao-grupo" id="grupoOpcoes" style="display: none;">
+                <label id="labelOpcoes">Selecione a Opção:</label>
+                <div class="grid-tamanhos" id="opcoesTamanho">
+                    <!-- Opções de tamanho serão injetadas aqui via JS -->
+                </div>
+            </div>
+
+            <div class="selecao-grupo">
+                <label>1. Escolha a Data:</label>
+                <input type="text" id="dataInput" placeholder="Clique para selecionar...">
+            </div>
+
+            <div class="selecao-grupo">
+                <label>2. Horários Disponíveis:</label>
+                <div class="grid-horarios">
+                    <button class="btn-hora" onclick="selecionarHora(this, '09:00')">09:00</button>
+                    <button class="btn-hora" onclick="selecionarHora(this, '11:00')">11:00</button>
+                    <button class="btn-hora" onclick="selecionarHora(this, '14:00')">14:00</button>
+                    <button class="btn-hora" onclick="selecionarHora(this, '16:00')">16:00</button>
+                </div>
+            </div>
+
+            <div class="selecao-grupo">
+                <label>3. Seu Nome:</label>
+                <input type="text" id="nomeCliente" placeholder="Digite seu nome completo">
+            </div>
+
+            <!-- Mensagem de erro que aparecerá aqui -->
+            <div id="mensagemErro" class="mensagem-erro"></div>
+
+            <button class="btn-confirmar" onclick="finalizarAgendamento()">
+                Confirmar no WhatsApp <img src="https://api.iconify.design/ic:baseline-whatsapp.svg?color=white" alt="WhatsApp" style="width: 20px; height: 20px;">
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Aviso para Mega Hair -->
+    <div class="modal-overlay" id="modalAvisoMegaHair">
+        <div class="modal-box">
+            <span class="fechar-modal" onclick="fecharAvisoMegaHair()">&times;</span>
+            <h2>Observação</h2>
+            <p style="text-align: center; line-height: 1.6; font-size: 1rem; color: var(--texto-corpo);">
+                Ajustes de tela grátis por 7 dias.
+                <br><br>
+                Após 7 dias — <strong>R$ 10,00 por ajuste</strong>.
+            </p>
+            <button class="btn-confirmar" style="margin-top: 20px;" onclick="fecharAvisoMegaHair()">Entendi</button>
+        </div>
+    </div>
+
+    <!-- 3. Adicionar JS do Flatpickr antes do fechamento do body -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script> <!-- Tradução para Português -->
+
+    <script>
+        // --- LÓGICA (Mantida igual, apenas adaptada ao novo layout) ---
+
+        let servicoAtual = "";
+        let precoAtual = "";
+        let horarioSelecionado = "";
+        let precosPorTamanho = null;
+        let tamanhoSelecionado = "";
+        let unidadePreco = ""; // Novo: para armazenar unidades como "/grama"
+        let avisoMegaHairMostrado = false; // Flag para controlar o aviso
+
+        // 4. Ativar e configurar o Flatpickr no campo de data
+        flatpickr("#dataInput", {
+            locale: "pt", // Usa a tradução que importamos
+            dateFormat: "d/m/Y", // Formato que o usuário vê
+            minDate: "today", // Impede a seleção de datas passadas
+            altInput: true, // Cria um input visualmente separado (melhor para formatos)
+            altFormat: "Y-m-d", // Formato que o código vai usar (compatível com o anterior)
+            disableMobile: "true" // Força o uso do calendário customizado em celulares
+        });
+
+        // 5. Inicializar o Swiper para o carrossel de categorias
+        document.addEventListener('DOMContentLoaded', function() {
+            new Swiper('.filtro-categorias-swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 15,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                // watchOverflow: true faz com que as setas desapareçam se não houver mais itens para rolar.
+                watchOverflow: true, 
+            });
+        });
+
+
+
+        function abrirModal(nomeServico, preco, unidade = '') {
+            // Reseta estados anteriores
+            servicoAtual = "";
+            precoAtual = "";
+            horarioSelecionado = "";
+            precosPorTamanho = null;
+            tamanhoSelecionado = "";
+            unidadePreco = unidade; // Reseta e define a nova unidade
+            document.getElementById('grupoOpcoes').style.display = 'none';
+            document.getElementById('opcoesTamanho').innerHTML = '';
+            document.querySelectorAll('.btn-hora').forEach(btn => btn.classList.remove('selecionado'));
+            document.getElementById('nomeCliente').value = '';
+            document.getElementById('mensagemErro').style.display = 'none';
+
+            servicoAtual = nomeServico;
+
+            if (typeof preco === 'object' && preco !== null) {
+                // É um serviço com preço variável
+                precosPorTamanho = preco;
+                const grupoOpcoes = document.getElementById('grupoOpcoes');
+                const opcoesTamanho = document.getElementById('opcoesTamanho');
+                
+                // Cria os botões de tamanho
+                Object.keys(precosPorTamanho).forEach(tamanho => {
+                    const valor = precosPorTamanho[tamanho];
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-tamanho';
+                    btn.innerText = `${tamanho} (R$ ${valor.toFixed(2).replace('.',',')}${unidadePreco})`;
+                    btn.onclick = () => selecionarTamanho(tamanho, valor, btn);
+                    opcoesTamanho.appendChild(btn);
+                });
+
+                grupoOpcoes.style.display = 'block';
+                document.getElementById('servicoSelecionado').innerText = servicoAtual; // Mostra só o nome inicialmente
+            } else {
+                // É um serviço com preço fixo
+                precoAtual = preco;
+                document.getElementById('servicoSelecionado').innerText = `${nomeServico} • R$ ${preco.toFixed(2).replace('.',',')}${unidadePreco}`;
+            }
+
+            document.getElementById('modalAgendamento').style.display = 'flex';
+        }
+
+        function selecionarTamanho(tamanho, valor, elemento) {
+            document.querySelectorAll('.btn-tamanho').forEach(btn => btn.classList.remove('selecionado'));
+            elemento.classList.add('selecionado');
+            
+            // Verifica se a opção é um tamanho (P, M, G) ou um tipo de serviço
+            if (['P', 'M', 'G'].includes(tamanho.toUpperCase())) {
+                tamanhoSelecionado = ` (Tamanho: ${tamanho})`;
+            } else {
+                tamanhoSelecionado = ` (${tamanho})`;
+            }
+
+            precoAtual = valor;
+            document.getElementById('servicoSelecionado').innerText = `${servicoAtual} • R$ ${precoAtual.toFixed(2).replace('.',',')}${unidadePreco}`;
+        }
+
+        function fecharModal() {
+            // Limpa o calendário ao fechar o modal para a próxima reserva
+            const fp = document.querySelector("#dataInput")._flatpickr;
+            if (fp) fp.clear();
+            
+            // Esconde o grupo de tamanhos para a próxima abertura
+            document.getElementById('grupoOpcoes').style.display = 'none';
+            document.getElementById('opcoesTamanho').innerHTML = '';
+            document.getElementById('modalAgendamento').style.display = 'none';
+        }
+
+        function fecharAvisoMegaHair() {
+            document.getElementById('modalAvisoMegaHair').style.display = 'none';
+        }
+
+        // Fecha o modal se clicar fora da caixa branca
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalAgendamento');
+            if (event.target == modal) {
+                fecharModal();
+            }
+        }
+
+        // Função para mostrar os cards com animação
+        function mostrarCards(categoria) {
+            const cards = document.querySelectorAll('.card-servico');
+            cards.forEach((card, index) => {
+                const cardCategoria = card.dataset.categoria;
+                if (categoria === 'todos' || cardCategoria === categoria) {
+                    card.style.display = 'block';
+                    card.style.animation = `fadeIn 0.4s ease-out ${index * 0.05}s forwards`;
+                } else {
+                    card.style.display = 'none';
+                    card.style.animation = 'none';
+                }
+            });
+        }
+
+        function filtrarServicos(categoria, elementoBotao) {
+            // Mostra o aviso se a categoria for 'Mega hair' e ainda não tiver sido mostrado
+            if (categoria === 'Mega hair' && !avisoMegaHairMostrado) {
+                document.getElementById('modalAvisoMegaHair').style.display = 'flex';
+                avisoMegaHairMostrado = true; // Marca que o aviso já foi exibido nesta sessão
+            }
+
+            const loader = document.getElementById('loader');
+            const cards = document.querySelectorAll('.card-servico');
+
+            // Atualiza o estado ativo dos botões
+            document.querySelectorAll('.btn-filtro').forEach(btn => btn.classList.remove('ativo'));
+            elementoBotao.classList.add('ativo');
+
+            // 1. Esconde todos os cards e mostra o loader
+            cards.forEach(card => card.style.display = 'none');
+            loader.style.display = 'block';
+
+            // 2. Simula um tempo de carregamento e depois filtra
+            setTimeout(() => {
+                loader.style.display = 'none';
+                mostrarCards(categoria);
+            }, 400); // 400ms de delay
+        }
+
+        function selecionarHora(elemento, hora) {
+            document.querySelectorAll('.btn-hora').forEach(btn => btn.classList.remove('selecionado'));
+            elemento.classList.add('selecionado');
+            horarioSelecionado = hora;
+        }
+
+        // Mostra todos os serviços quando a página carrega pela primeira vez
+        document.addEventListener('DOMContentLoaded', () => {
+            mostrarCards('todos');
+        });
+
+        function finalizarAgendamento() {
+            const data = document.querySelector("#dataInput")._flatpickr.selectedDates[0];
+            const nome = document.getElementById('nomeCliente').value;
+            const mensagemErroEl = document.getElementById('mensagemErro');
+
+            // Validação específica para preço variável
+            if (precosPorTamanho && !precoAtual) {
+                mensagemErroEl.innerText = "Por favor, selecione o tamanho do cabelo.";
+                mensagemErroEl.style.display = 'block';
+                return;
+            }
+            if (!data || !horarioSelecionado || !nome) { 
+                // Mostra a mensagem de erro customizada em vez do alert
+                mensagemErroEl.innerText = "Por favor, preencha todos os campos.";
+                mensagemErroEl.style.display = 'block';
+                return; 
+            }
+
+            // Formata a data para exibição (ex: 02/12/2025)
+            const dia = String(data.getDate()).padStart(2, '0');
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const ano = data.getFullYear();
+            const dataFormatada = `${dia}/${mes}/${ano}`;
+
+            mensagemErroEl.style.display = 'none'; // Esconde a mensagem se tudo estiver ok
+            
+            // Link do WhatsApp
+            const mensagem = `Olá! Gostaria de confirmar meu horário.%0A%0A` +
+                             `*Cliente:* ${nome}%0A` + 
+                             `*Serviço:* ${servicoAtual}${tamanhoSelecionado}%0A` +
+                             `*Valor:* R$ ${precoAtual}${unidadePreco}%0A` +
+                             `*Data:* ${dataFormatada}%0A` +
+                             `*Horário:* ${horarioSelecionado}`;
+
+            // --- SEU NÚMERO AQUI ---
+            const numeroWhatsApp = "5599984454254"; 
+
+            window.open(`https://wa.me/${numeroWhatsApp}?text=${mensagem}`, '_blank');
+            fecharModal();
+        }
+    </script>
+</body>
+</html>
