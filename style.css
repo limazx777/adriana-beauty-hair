@@ -1,0 +1,348 @@
+/* --- CSS Global --- */
+:root {
+    --cor-primaria: #b76e79; /* Rose Gold */
+    --cor-secundaria: #f4e4e9; /* Rosa muito pálido */
+    --texto-escuro: #2c3e50;
+    --branco: #ffffff;
+    --whatsapp: #25d366;
+}
+
+html {
+    scroll-behavior: smooth; /* MELHORIA: Rolagem suave ao clicar nos links */
+}
+
+body {
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+    color: var(--texto-escuro);
+    overflow-x: hidden;
+}
+
+/* MELHORIA: Impede a rolagem da página quando o menu mobile está aberto */
+html.no-scroll, body.no-scroll {
+    /* A combinação de position: fixed e overflow: hidden é a mais robusta contra scroll em mobiles */
+    position: fixed;
+    overflow: hidden;
+    width: 100%; /* Garante que a largura não seja perdida */
+    height: 100%;
+}
+
+h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+/* --- Menu de Navegação --- */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* MELHORIA: Garante alinhamento vertical consistente */
+    padding: 20px 50px;
+    background-color: var(--branco);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--cor-primaria);
+}
+
+/* MELHORIA: Ajuste no tamanho da imagem do logo */
+.logo img {
+    height: 50px; /* Define uma altura para a imagem do logo */
+    vertical-align: middle; /* Alinha a imagem verticalmente com o texto (se houver) */
+}
+
+.menu-links a {
+    text-decoration: none;
+    color: var(--texto-escuro);
+    margin-left: 30px;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.menu-links a:hover, .menu-links a.cta { color: var(--cor-primaria); }
+
+/* --- MELHORIA: Menu Hambúrguer para Mobile --- */
+.menu-mobile-icon {
+    display: none; /* Escondido em telas grandes */
+    cursor: pointer;
+}
+
+.menu-mobile-icon button {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--texto-escuro);
+}
+
+/* MELHORIA: Ajusta o estilo do botão 'X' quando o menu está ativo */
+.menu-mobile-icon button.active {
+    font-size: 2.8rem; /* Aumenta o tamanho do 'X' */
+    line-height: 1; /* Garante alinhamento vertical */
+    padding-bottom: 5px; /* Pequeno ajuste para centralizar */
+}
+
+/* Estilo para o menu quando aberto no mobile */
+.menu-links.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza os itens do menu */
+    position: fixed; /* MELHORIA: Fixa o menu na tela */
+    top: 86px; /* Altura da barra de navegação (ajustado) */
+    right: 0;
+    left: 0; /* MELHORIA: Garante que o menu ocupe toda a largura */
+    background: var(--branco);
+    height: calc(100vh - 86px); /* MELHORIA: Ocupa o restante da altura da tela */
+    text-align: center;
+    box-shadow: 0 8px 10px rgba(0,0,0,0.05);
+    padding: 40px 0; /* Aumenta o espaçamento interno */
+}
+
+/* MELHORIA: Garante que o menu ativo ocupe o espaço corretamente */
+.menu-links.active a {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* --- Hero Section (Capa) --- */
+.hero {
+    height: 100vh;
+    /* MELHORIA: Aumentei a opacidade da sombra (0.5) para o texto branco ficar mais legível */
+    background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('./img/fundo.png');
+    background-size: cover;
+    /* MELHORIA: Ajuste da posição da imagem de fundo. */
+    /* Altere o primeiro valor (a porcentagem) para mover a imagem para os lados. */
+    /* 50% é o centro. Valores maiores movem para a direita, menores para a esquerda. */
+    background-position: 65% center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--branco);
+}
+
+.hero h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); } /* MELHORIA: Fonte fluida */
+.hero p { font-size: 1.2rem; margin-bottom: 30px; letter-spacing: 1px; }
+
+.btn-agendar {
+    padding: 15px 40px;
+    background-color: var(--cor-primaria);
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 30px;
+    transition: transform 0.3s, background 0.3s;
+}
+
+.btn-agendar:hover {
+    background-color: #a05a65;
+    transform: scale(1.05);
+}
+
+/* --- Seção Sobre --- */
+.sobre {
+    padding: 80px 20px;
+    text-align: center;
+    background-color: var(--branco);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* --- Galeria de Trabalhos --- */
+.galeria {
+    padding: 50px 10%;
+    background-color: var(--cor-secundaria);
+}
+
+.galeria h2 { text-align: center; margin-bottom: 40px; color: var(--cor-primaria); }
+
+.grid-galeria {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.card-foto {
+    background: white;
+    height: 300px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    position: relative;
+    transition: transform 0.3s;
+}
+
+.card-foto:hover { transform: translateY(-10px); }
+
+.card-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-legenda {
+    position: absolute;
+    bottom: 0;
+    background: rgba(255,255,255,0.9);
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    color: var(--cor-primaria);
+}
+
+/* --- MELHORIA: Seção de Depoimentos --- */
+.depoimentos {
+    padding: 60px 20px;
+    background-color: var(--branco);
+    text-align: center;
+}
+
+.depoimentos h2 { color: var(--cor-primaria); margin-bottom: 30px; }
+
+.container-depoimentos {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.card-depoimento {
+    background: #fff;
+    border: 1px solid var(--cor-secundaria);
+    padding: 25px;
+    border-radius: 15px;
+    max-width: 300px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.card-depoimento p { font-style: italic; color: #555; }
+.card-depoimento h4 { margin-top: 15px; color: var(--cor-primaria); margin-bottom: 0;}
+
+/* --- Footer Melhorado --- */
+footer {
+    background-color: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+    margin-top: 0;
+}
+
+footer p { margin: 5px 0; font-size: 0.9rem; opacity: 0.8; }
+
+.redes-sociais {
+    margin: 20px 0;
+}
+
+.redes-sociais a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+    transition: color 0.3s;
+    /* MELHORIA: Alinha o ícone e o texto verticalmente */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Espaço entre o ícone e o texto */
+}
+
+.redes-sociais a:hover { color: var(--cor-primaria); }
+
+/* MELHORIA: Centraliza estilos dos ícones */
+.redes-sociais img {
+    width: 22px;
+    height: 22px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .hero h1 { font-size: 2.5rem; }
+    /* MELHORIA: Ajusta a posição da imagem de fundo no mobile para focar mais à direita. */
+    /* Você pode alterar o primeiro valor (70%) para mover a imagem horizontalmente. */
+    /* Valores maiores que 50% movem para a direita, menores para a esquerda. */
+    .hero { background-position: 80% center; }
+    
+    .hero p { font-size: 1.1rem; }
+    nav { padding: 20px; flex-direction: row; } /* Garante logo e ícone na mesma linha */
+    
+    .menu-mobile-icon { display: block; } /* Mostra o ícone do hambúrguer */
+    
+    .menu-links { display: none; } /* Esconde os links por padrão */
+    
+    .menu-links a {
+        margin: 0;
+        padding: 15px;
+        font-size: 1rem;
+        width: 100%;
+    }
+
+    .galeria { padding: 50px 20px; } /* MELHORIA: Unifica o padding lateral */
+}
+
+@media (max-width: 600px) {
+    .hero {
+        background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('./img/fundo.png');
+        /* MELHORIA: Garante que o topo da imagem seja priorizado em telas estreitas */
+        /* Altere o valor da porcentagem para mover a imagem para os lados. */
+        /* 80% move para a direita, 20% para a esquerda. */
+        background-position: 80% top;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1 { font-size: 2.2rem; }
+    .hero p { font-size: 1rem; }
+    .sobre { padding: 60px 20px; }
+    .galeria { padding: 40px 20px; }
+    .depoimentos { padding: 50px 20px; }
+}
+
+/* --- MELHORIA: Animações de Scroll --- */
+.animar {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.animar.visivel {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* --- Botões Flutuantes de Redes Sociais --- */
+.botoes-flutuantes {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1010; /* Acima de outros elementos */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.btn-flutuante {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+}
+
+.btn-flutuante:hover {
+    transform: scale(1.1);
+}
+
+/* MELHORIA: Centraliza estilos dos ícones */
+.btn-flutuante img {
+    width: 30px;
+    height: 30px;
+}
+.btn-flutuante.whatsapp { background-color: var(--whatsapp); }
+.btn-flutuante.instagram { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }

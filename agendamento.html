@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Adriana Beauty Hair">
+    <meta name="keywords" content="cabelo, salão, beleza, estética, cílios, manicure, Lago da Pedra, agendamento">
     <title>Reservas | Adriana Beauty Hair</title>
     <!-- 1. Adicionar CSS do Flatpickr (biblioteca de calendário) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -108,14 +110,8 @@
 
         /* Estilo dos botões de navegação do Swiper */
         .swiper-button-next, .swiper-button-prev {
+            display: none; /* OCULTA os botões de navegação do carrossel */
             color: var(--cor-primaria);
-            background-color: rgba(255, 255, 255, 0.8); /* MELHORIA: Fundo para melhor visibilidade */
-            border-radius: 50%;
-            width: 30px !important;
-            height: 30px !important;
-            top: 50%;
-            transform: translateY(-50%) scale(0.6);
-            transform: scale(0.7);
         }
 
         .btn-filtro {
@@ -439,9 +435,6 @@
                 gap: 10px;
             }
             .btn-hora { flex: auto; } /* Reseta o flex para o grid funcionar */
-            .swiper-button-next, .swiper-button-prev {
-                display: none; /* MELHORIA: Esconde as setas de navegação no mobile, o swipe é suficiente */
-            }
 
         }
 
